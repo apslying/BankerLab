@@ -31,8 +31,8 @@ class Task:
 
 def createActivities():
     taskArray=[]
-    file = open('input-07.txt', mode='r')
-    #file = open(sys.argv[1], mode='r')
+    #file = open('input-07.txt', mode='r')
+    file = open(sys.argv[1], mode='r')
     a = file.read()
     assert isinstance(a, str)
     a=a.replace('  ', ' ')
