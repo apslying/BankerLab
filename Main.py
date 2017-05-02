@@ -1,5 +1,7 @@
 import operator
 import pprint
+import copy
+import sys
 class Activity:
     def __init__(self, action, taskNumber, delay, resourceType, numberOfResources):
         self.action=action
@@ -16,19 +18,20 @@ class Task:
     runTime=0
     waitTime=0
     blocked=False
+    visited=False
     def __init__(self):
         self.initialClaims = []
         self.currentlyHelds = []
         self.arrayOfActivities=[]
 
     def __repr__(self):
-        return "<%s %s %s %s %s %s %s>" % (self.initialClaims, self.currentlyHelds, self.currentIndex, self.runTime, self.waitTime, self.blocked, self.arrayOfActivities)
+        return "<%s %s %s %s %s %s %s %s>" % (self.initialClaims, self.currentlyHelds, self.currentIndex, self.runTime, self.waitTime, self.blocked, self.arrayOfActivities, self.visited)
 
 
 def createActivities():
-
     taskArray=[]
-    file = open('input-06.txt', mode='r')
+    file = open('input-02.txt', mode='r')
+    #file = open(sys.argv[1], mode='r')
     a = file.read()
     assert isinstance(a, str)
     a=a.replace('  ', ' ')
@@ -68,6 +71,7 @@ def isEnd(taskArray):
     return True
 
 def runFifo(taskArray):
+    blockedQueue=[]
     pp = pprint.PrettyPrinter()
     time=0
     banker=[4]
@@ -97,7 +101,6 @@ def runFifo(taskArray):
 
             for task in taskArray:
                 task.blocked=False #NOT CORRECT- WILL MESS UP RUN/WAIT TIMES
-                task.waitTime+=1
 
             taskArray[index].currentIndex=-2
             print 'here', taskArray
@@ -107,9 +110,9 @@ def runFifo(taskArray):
             print 'alive'
             for index, task in enumerate(taskArray):
                 # check if task has terminated
-                if task.currentIndex!=-1 and task.currentIndex!=-2:
-                    print 'task', index+1
-                    task.blocked=False #reset blocked state
+                if task.currentIndex!=-1 and task.currentIndex!=-2 and task.blocked==True:
+                    task.visited=True
+                    print 'task/blocked', index+1
                     activity=task.arrayOfActivities[task.currentIndex]
                     #perform the specified action
                     if activity.action == 'initiate':
@@ -123,6 +126,7 @@ def runFifo(taskArray):
                         print 'request'
                         if banker[activity.resourceType-1]>= activity.numberOfResources:
                             print'-success'
+                            task.blocked=False
                             banker[activity.resourceType - 1] -= activity.numberOfResources
                             task.currentlyHelds[activity.resourceType - 1] += activity.numberOfResources
                             task.runTime += 1
@@ -149,6 +153,53 @@ def runFifo(taskArray):
                         task.currentIndex=-1
                         # print banker
                         # print taskArray
+
+            for index, task in enumerate(taskArray):
+                # check if task has terminated
+                if task.currentIndex!=-1 and task.currentIndex!=-2 and task.visited==False:
+                    print 'task/open', index+1
+                    activity=task.arrayOfActivities[task.currentIndex]
+                    #perform the specified action
+                    if activity.action == 'initiate':
+                        print 'initiate'
+                        task.initialClaims[activity.resourceType-1]=activity.numberOfResources
+                        task.runTime+=1
+                        task.currentIndex += 1
+                        # print banker
+                        # print taskArray
+                    elif activity.action == 'request':
+                        print 'request'
+                        if banker[activity.resourceType-1]>= activity.numberOfResources:
+                            print'-success'
+                            task.blocked=False
+                            banker[activity.resourceType - 1] -= activity.numberOfResources
+                            task.currentlyHelds[activity.resourceType - 1] += activity.numberOfResources
+                            task.runTime += 1
+                            task.currentIndex += 1
+                        else:
+                            print '-blocked'
+                            task.blocked=True
+                            task.runTime += 1
+                            task.waitTime+=1
+
+                        # print banker
+                        # print taskArray
+                    elif activity.action == 'release':
+                        print 'release'
+                        middlebanker[activity.resourceType - 1] += activity.numberOfResources
+                        task.currentlyHelds[activity.resourceType - 1] -= activity.numberOfResources
+                        task.runTime+=1
+                        task.currentIndex += 1
+                        # print banker
+                        # print taskArray
+
+                    elif activity.action == 'terminate':
+                        print 'terminate'
+                        task.currentIndex=-1
+                        # print banker
+                        # print taskArray
+            for task in taskArray:
+                task.visited=False
             pp.pprint(taskArray)
             banker=map(operator.add, banker, middlebanker)
             print banker
@@ -156,6 +207,170 @@ def runFifo(taskArray):
             time+=1
     return taskArray
 
+
+def runBankers(taskArray):
+    pp = pprint.PrettyPrinter()
+    pp.pprint(taskArray)
+    blockedQueue = []
+    time = 0
+    banker = [4]
+    middlebanker = [0]  # purpose is to deal with Important Note in banker.pdf
+    # print taskArray
+    # while isEnd(taskArray) == False:
+    for i in range(0,5):
+        print 'time', time, '-', time + 1
+        for task in taskArray:
+            if task.currentIndex != -1:
+
+                if task.blocked==True:
+                    blockedQueue.append(task)
+
+        for index, task in enumerate(blockedQueue):
+            # check if task has terminated
+                print 'task/blocked', index + 1
+                activity = task.arrayOfActivities[task.currentIndex]
+                # perform the specified action
+                if activity.action == 'initiate':
+                    print 'initiate'
+                    task.initialClaims[activity.resourceType - 1] = activity.numberOfResources
+                    task.runTime += 1
+                    task.currentIndex += 1
+                    # print banker
+                    # print taskArray
+                elif activity.action == 'request':
+                    print 'request'
+                    isSafe(banker, taskArray, activity)
+                    if isSafe(banker, taskArray, activity):
+                        print'-success'
+                        task.blocked = False
+                        banker[activity.resourceType - 1] -= activity.numberOfResources
+                        task.currentlyHelds[activity.resourceType - 1] += activity.numberOfResources
+                        task.runTime += 1
+                        task.currentIndex += 1
+                    else:
+                        print '-blocked'
+                        task.blocked = True
+                        task.runTime += 1
+                        task.waitTime += 1
+
+                        # print banker
+                        # print taskArray
+                elif activity.action == 'release':
+                    print 'release'
+                    middlebanker[activity.resourceType - 1] += activity.numberOfResources
+                    task.currentlyHelds[activity.resourceType - 1] -= activity.numberOfResources
+                    task.runTime += 1
+                    task.currentIndex += 1
+                    # print banker
+                    # print taskArray
+
+                elif activity.action == 'terminate':
+                    print 'terminate'
+                    task.currentIndex = -1
+                    # print banker
+                    # print taskArray
+
+        for index, task in enumerate(taskArray):
+            # check if task has terminated
+            if task not in blockedQueue and task.currentIndex != -1:
+                print 'task/open', index + 1
+                print
+                activity = task.arrayOfActivities[task.currentIndex]
+                # perform the specified action
+                if activity.action == 'initiate':
+                    print 'initiate'
+                    task.initialClaims[activity.resourceType - 1] = activity.numberOfResources
+                    task.runTime += 1
+                    task.currentIndex += 1
+                    # print banker
+                    # print taskArray
+                elif activity.action == 'request':
+                    print 'request'
+                    if isSafe(banker, taskArray, activity):
+                        print'-success'
+                        task.blocked = False
+                        banker[activity.resourceType - 1] -= activity.numberOfResources
+                        task.currentlyHelds[activity.resourceType - 1] += activity.numberOfResources
+                        task.runTime += 1
+                        task.currentIndex += 1
+                    else:
+                        print '-blocked'
+                        task.blocked = True
+                        task.runTime += 1
+                        task.waitTime += 1
+
+                        # print banker
+                        # print taskArray
+                elif activity.action == 'release':
+                    print 'release'
+                    middlebanker[activity.resourceType - 1] += activity.numberOfResources
+                    task.currentlyHelds[activity.resourceType - 1] -= activity.numberOfResources
+                    task.runTime += 1
+                    task.currentIndex += 1
+                    # print banker
+                    # print taskArray
+
+                elif activity.action == 'terminate':
+                    print 'terminate'
+                    task.currentIndex = -1
+                    # print banker
+                    # print taskArray
+
+        for task in taskArray:
+            task.visited = False
+        pp.pprint(taskArray)
+        banker = map(operator.add, banker, middlebanker)
+        print banker
+        middlebanker = [0]
+        time += 1
+    return taskArray
+
+
+def isSafe(banker, taskArray, activity):
+    newTaskArray=[]
+    for task in taskArray:
+        newTask=copy.deepcopy(task)
+        newTaskArray.append(newTask)
+
+    newBanker=copy.deepcopy(banker)
+    pp = pprint.PrettyPrinter()
+    # print 'new'
+    # pp.pprint(newTaskArray)
+    # print 'is it safe?'
+    # print newBanker
+    # pp.pprint(newTaskArray)
+    # print activity
+    # print '-------------------'
+    bankerAfter=newBanker[activity.resourceType - 1] - activity.numberOfResources
+    # pp.pprint(taskArray)
+    newTaskArray[activity.taskNumber-1].currentlyHelds[activity.resourceType - 1] += activity.numberOfResources
+    # print 'end'
+    # pp.pprint(taskArray)
+    print 'banker', bankerAfter
+    #try to terminate a task to gain more resources
+    flag=0
+    # print 'here'
+    pp.pprint(newTaskArray)
+    while flag==0:
+        flag=1
+        for task in newTaskArray:
+            if bankerAfter >= task.initialClaims[activity.resourceType-1]-task.currentlyHelds[activity.resourceType-1]:
+                bankerAfter+=task.currentlyHelds[activity.resourceType-1]
+                flag=0
+                newTaskArray.remove(task)
+                break
+
+    print 'there'
+    pp.pprint(newTaskArray)
+
+
+    if newTaskArray:
+
+        print 'false'
+        return False
+    else:
+        print 'true'
+        return True
 
 def printSummaryData(taskArray):
     print taskArray
@@ -172,8 +387,19 @@ def printSummaryData(taskArray):
 
     print 'total', '\t', totalRunTime, totalWaitTime, str(float(100*totalWaitTime/float(totalRunTime)))+'%'
 
+def printSummaryDataBankers(taskArray):
+    print 'Bankers'
+    totalRunTime = 0
+    totalWaitTime = 0
+    for index, task in enumerate(taskArray):
+        print 'Task' + str(index + 1), '\t', task.runTime, task.waitTime, str(
+            100 * task.waitTime / float(task.runTime)) + '%'
+        totalRunTime += task.runTime
+        totalWaitTime += task.waitTime
 
+    print 'total', '\t', totalRunTime, totalWaitTime, str(float(100 * totalWaitTime / float(totalRunTime))) + '%'
 
-printSummaryData(runFifo(createActivities()))
+printSummaryDataBankers(runBankers(createActivities()))
+#printSummaryData(runFifo(createActivities()))
 # runFifo(createActivities())
 # createActivities()
