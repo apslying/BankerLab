@@ -15,6 +15,7 @@ class Activity:
         return "<%s %s %s %s %s>" % (self.action, self.taskNumber, self.delay, self.resourceType, self.numberOfResources)
 
 class Task:
+    currentDelay=-1
     currentIndex=0
     runTime=0
     waitTime=0
@@ -26,13 +27,13 @@ class Task:
         self.arrayOfActivities=[]
 
     def __repr__(self):
-        return "<%s %s %s %s %s %s %s %s>" % (self.initialClaims, self.currentlyHelds, self.currentIndex, self.runTime, self.waitTime, self.blocked, self.arrayOfActivities, self.number)
+        return "<%s %s %s %s %s %s %s %s %s>" % (self.currentDelay, self.initialClaims, self.currentlyHelds, self.currentIndex, self.runTime, self.waitTime, self.blocked, self.arrayOfActivities, self.number)
 
 
 def createActivities():
     taskArray=[]
-    file = open('input-13.txt', mode='r')
-    #file = open(sys.argv[1], mode='r')
+    #file = open('input-03.txt', mode='r')
+    file = open(sys.argv[1], mode='r')
     a = file.read()
     assert isinstance(a, str)
     a=a.replace('  ', ' ')
@@ -56,6 +57,10 @@ def createActivities():
                     obj.currentlyHelds.append(0)
                 taskArray.append(obj)
 
+            banker=[]
+            for i in range (2, len(data)):
+                banker.append(int(data[i]))
+
         elif line==arr[len(arr)-1]:
             print 'last line'
         else:
@@ -63,7 +68,8 @@ def createActivities():
             taskArray[obj.taskNumber-1].arrayOfActivities.append(obj)
 
     #print taskArray
-    return taskArray
+    return (banker,taskArray)
+
 
 # def isEnd(blockedQueue):
 #     for task in blockedQueue:
@@ -72,6 +78,9 @@ def createActivities():
 #     return True
 
 def isDeadlocked(blockedQueue):
+    pp = pprint.PrettyPrinter()
+    print 'blocked'
+    pp.pprint(blockedQueue)
     for task in blockedQueue:
         if task.blocked == False:
             return False
@@ -90,19 +99,27 @@ def indexOfTaskToAbort(blockedQueue):
     print 'i', i
     return i
 
+
 def runFifo(taskArray):
+    flag=0
     pp = pprint.PrettyPrinter()
+    pp.pprint(taskArray)
     openQueue=[]
     nextBlockedQueue=[]
     terminatedQueue=[]
     blockedQueue=copy.deepcopy(taskArray)
 
     time=0
-    banker=[4]
-    middlebanker=[0] #purpose is to deal with Important Note in banker.pdf
+    # initializeBanker(taskArray)
+    banker=createActivities()[0]
+    print banker
+    middlebanker=createActivities()[0] #purpose is to deal with Important Note in banker.pdf
+    for i in range(0, len(middlebanker)):
+        middlebanker[i]=0
+    print 'middlebanker', middlebanker
     #print taskArray
     while blockedQueue:
-    #for i in range(0,6):
+    #for i in range(0,10):
         print 'time', time, '-', time+1
 
         if isDeadlocked(blockedQueue):
@@ -125,6 +142,7 @@ def runFifo(taskArray):
 
             print 'end of deadlock'
             pp.pprint(blockedQueue)
+            flag=1
 
 
         print 'alive'
@@ -133,55 +151,74 @@ def runFifo(taskArray):
             if task.currentIndex!=-1 and task.currentIndex!=-2:
                 print 'task', task.arrayOfActivities[0].taskNumber
                 activity=task.arrayOfActivities[task.currentIndex]
-                #perform the specified action
-                if activity.action == 'initiate':
-                    print 'initiate'
-                    task.number=int(task.arrayOfActivities[0].taskNumber)
-                    task.initialClaims[activity.resourceType-1]=activity.numberOfResources
-                    task.runTime+=1
-                    task.currentIndex += 1
-                    # print banker
-                    # print taskArray
-                    openQueue.append(task)
 
-                elif activity.action == 'request':
-                    print 'request'
-                    if banker[activity.resourceType-1]>= activity.numberOfResources:
-                        print'-success'
-                        task.blocked=False
-                        banker[activity.resourceType - 1] -= activity.numberOfResources
-                        task.currentlyHelds[activity.resourceType - 1] += activity.numberOfResources
-                        task.runTime += 1
+                if task.currentDelay==-1 and activity.delay==0 or task.currentDelay==0 and activity.delay!=0:
+
+                    #perform the specified action
+                    task.currentDelay = -1
+                    if activity.action == 'initiate':
+                        print 'initiate'
+                        task.number=int(task.arrayOfActivities[0].taskNumber)
+                        task.initialClaims[activity.resourceType-1]=activity.numberOfResources
+                        task.runTime+=1
                         task.currentIndex += 1
+                        # print banker
+                        # print taskArray
                         openQueue.append(task)
 
-                    else:
-                        print '-blocked'
-                        task.blocked=True
-                        task.runTime += 1
-                        task.waitTime+=1
-                        nextBlockedQueue.append(task)
+                    elif activity.action == 'request':
+                        print 'request'
+                        if banker[activity.resourceType-1]>= activity.numberOfResources:
+                            print'-success'
+                            task.blocked=False
+                            banker[activity.resourceType - 1] -= activity.numberOfResources
+                            task.currentlyHelds[activity.resourceType - 1] += activity.numberOfResources
+                            task.runTime += 1
+                            task.currentIndex += 1
+                            openQueue.append(task)
+                            flag=0
 
-                    # print banker
-                    # print taskArray
-                elif activity.action == 'release':
-                    print 'release'
-                    middlebanker[activity.resourceType - 1] += activity.numberOfResources
-                    task.currentlyHelds[activity.resourceType - 1] -= activity.numberOfResources
-                    task.runTime+=1
-                    task.currentIndex += 1
-                    # print banker
-                    # print taskArray
+                        else:
+                            print '-blocked'
+                            task.blocked=True
+                            task.runTime += 1
+                            task.waitTime+=1
+                            nextBlockedQueue.append(task)
+
+                        # print banker
+                        # print taskArray
+                    elif activity.action == 'release':
+                        print 'release'
+                        middlebanker[activity.resourceType - 1] += activity.numberOfResources
+                        task.currentlyHelds[activity.resourceType - 1] -= activity.numberOfResources
+                        task.runTime+=1
+                        task.currentIndex += 1
+                        # print banker
+                        # print taskArray
+                        openQueue.append(task)
+
+
+                    elif activity.action == 'terminate':
+                        print 'terminate'
+                        task.currentIndex=-1
+                        # print banker
+                        # print taskArray
+                        terminatedQueue.append(task)
+                elif task.currentDelay>0 and activity.delay!=0: #in the process of decreasing
+                    print 'continue'
+                    task.currentDelay-=1
+                    task.runTime += 1
                     openQueue.append(task)
 
+                else: #its just now received an activity with delay
+                    print 'newly'
+                    task.currentDelay = activity.delay
+                    openQueue.append(task)
 
-                elif activity.action == 'terminate':
-                    print 'terminate'
-                    task.currentIndex=-1
-                    # print banker
-                    # print taskArray
-                    terminatedQueue.append(task)
-
+        if flag==1:
+            for task in blockedQueue:
+                task.runTime -= 1
+                task.waitTime -= 1
         time += 1
         blockedQueue=[]
         blockedQueue.extend(nextBlockedQueue)
@@ -193,7 +230,8 @@ def runFifo(taskArray):
 
         banker=map(operator.add, banker, middlebanker)
         print banker
-        middlebanker=[0]
+        for i in range(0, len(middlebanker)):
+            middlebanker[i] = 0
 
     print 'terminated'
     pp.pprint(terminatedQueue)
@@ -363,7 +401,8 @@ def isSafe(banker, taskArray, activity):
 
 def printSummaryData(terminatedQueue):
     print terminatedQueue
-    print 'FIFO'
+    print 'FIFO-------------------------------------------------------'
+    print '*Note the order of the tasks!'
     totalRunTime=0
     totalWaitTime=0
     for index, task in enumerate(terminatedQueue):
@@ -377,7 +416,8 @@ def printSummaryData(terminatedQueue):
     print 'total', '\t', totalRunTime, totalWaitTime, str(float(100*totalWaitTime/float(totalRunTime)))+'%'
 
 def printSummaryDataBankers(taskArray):
-    print 'Bankers'
+    print 'Bankers----------------------------------------------------'
+    print '*Note the order of the tasks!'
     totalRunTime = 0
     totalWaitTime = 0
     for index, task in enumerate(taskArray):
@@ -388,14 +428,7 @@ def printSummaryDataBankers(taskArray):
 
     print 'total', '\t', totalRunTime, totalWaitTime, str(float(100 * totalWaitTime / float(totalRunTime))) + '%'
 
-<<<<<<< HEAD
-printSummaryData(runFifo(createActivities()))
-#printSummaryDataBankers(runBankers(createActivities()))
-#runFifo(createActivities())
-# createActivities()
-=======
-printSummaryDataBankers(runBankers(createActivities()))
-#printSummaryData(runFifo(createActivities()))
-# runFifo(createActivities())
-# createActivities()
->>>>>>> 7284b7bfc5f5629b403c294cb184ff7939e0711f
+printSummaryData(runFifo(createActivities()[1]))
+#printSummaryDataBankers(runBankers(createActivities()[1]))
+#runFifo(createActivities()[1])
+# createActivities()[1]

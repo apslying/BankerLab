@@ -20,21 +20,11 @@
       <file leaf-file-name="Main.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/Main.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="150">
-              <caret line="32" column="16" lean-forward="false" selection-start-line="32" selection-start-column="16" selection-end-line="32" selection-end-column="16" />
+            <state relative-caret-position="414">
+              <caret line="419" column="41" lean-forward="false" selection-start-line="419" selection-start-column="41" selection-end-line="419" selection-end-column="41" />
               <folding>
                 <element signature="e#0#15#0" expanded="true" />
               </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="input-06.txt" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/input-06.txt">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="120">
-              <caret line="8" column="17" lean-forward="true" selection-start-line="8" selection-start-column="17" selection-end-line="8" selection-end-column="17" />
-              <folding />
             </state>
           </provider>
         </entry>
@@ -53,18 +43,8 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="input-01.txt" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/input-01.txt">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="60">
-              <caret line="4" column="17" lean-forward="true" selection-start-line="4" selection-start-column="17" selection-end-line="4" selection-end-column="17" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="input-03.txt" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/input-03.txt">
+      <file leaf-file-name="input-13.txt" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/input-13.txt">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="0">
               <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
@@ -89,6 +69,8 @@
       <find>while</find>
       <find>taskA</find>
       <find>wait</find>
+      <find>createA</find>
+      <find>middleb</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -106,7 +88,7 @@
   <component name="ProjectFrameBounds">
     <option name="x" value="6" />
     <option name="y" value="23" />
-    <option name="width" value="1256" />
+    <option name="width" value="849" />
     <option name="height" value="813" />
   </component>
   <component name="ProjectView">
@@ -344,7 +326,7 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="6" y="23" width="1256" height="813" extended-state="0" />
+    <frame x="6" y="23" width="849" height="813" extended-state="0" />
     <editor active="true" />
     <layout>
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.22057264" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
@@ -495,26 +477,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/input-03.txt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/input-02.txt">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="165">
           <caret line="11" column="0" lean-forward="true" selection-start-line="11" selection-start-column="0" selection-end-line="11" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/input-01.txt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="60">
-          <caret line="4" column="17" lean-forward="true" selection-start-line="4" selection-start-column="17" selection-end-line="4" selection-end-column="17" />
           <folding />
         </state>
       </provider>
@@ -539,10 +505,42 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/input-01.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="60">
+          <caret line="4" column="17" lean-forward="true" selection-start-line="4" selection-start-column="17" selection-end-line="4" selection-end-column="17" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/input-03.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/input-10.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/input-13.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/Main.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="150">
-          <caret line="32" column="16" lean-forward="false" selection-start-line="32" selection-start-column="16" selection-end-line="32" selection-end-column="16" />
+        <state relative-caret-position="414">
+          <caret line="419" column="41" lean-forward="false" selection-start-line="419" selection-start-column="41" selection-end-line="419" selection-end-column="41" />
           <folding>
             <element signature="e#0#15#0" expanded="true" />
           </folding>
