@@ -388,7 +388,14 @@ def printSummaryDataBankers(taskArray):
 
     print 'total', '\t', totalRunTime, totalWaitTime, str(float(100 * totalWaitTime / float(totalRunTime))) + '%'
 
+<<<<<<< HEAD
 printSummaryData(runFifo(createActivities()))
 #printSummaryDataBankers(runBankers(createActivities()))
 #runFifo(createActivities())
 # createActivities()
+=======
+printSummaryDataBankers(runBankers(createActivities()))
+#printSummaryData(runFifo(createActivities()))
+# runFifo(createActivities())
+# createActivities()
+>>>>>>> 7284b7bfc5f5629b403c294cb184ff7939e0711f
